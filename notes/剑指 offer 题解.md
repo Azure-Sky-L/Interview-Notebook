@@ -113,25 +113,24 @@ position-4 : (0,1,2,3,2,5) // nums[i] == nums[nums[i]], exit
 
 遍历到位置 4 时，该位置上的数为 2，但是第 2 个位置上已经有一个 2 的值了，因此可以知道 2 重复。
 
-```java
-public boolean duplicate(int[] nums, int length, int[] duplication) {
-    if (nums == null || length <= 0)
-        return false;
-    for (int i = 0; i < length; i++) {
-        while (nums[i] != i) {
-            if (nums[i] == nums[nums[i]]) {
-                duplication[0] = nums[i];
-                return true;
-            }
-            swap(nums, i, nums[i]);
-        }
-    }
-    return false;
-}
-
-private void swap(int[] nums, int i, int j) {
-    int t = nums[i]; nums[i] = nums[j]; nums[j] = t;
-}
+```python
+# -*- coding:utf-8 -*-
+class Solution:
+    # 这里要特别注意~找到任意重复的一个值并赋值到duplication[0]
+    # 函数返回True/False
+    def duplicate(self, numbers, duplication):
+        # write code here
+        if numbers is None or len(numbers) == 0:
+            return False
+        for i in xrange(len(numbers)):
+            while numbers[i] != i:
+                if numbers[i] == numbers[numbers[i]]:
+                    duplication[0] = numbers[i]
+                    return True
+                temp = numbers[numbers[i]]
+                numbers[numbers[i]] = numbers[i]
+                numbers[i] = temp
+        return False
 ```
 
 # 4. 二维数组中的查找
@@ -162,22 +161,27 @@ Given target = 20, return false.
 
 复杂度：O(M + N) + O(1)
 
-```java
-public boolean Find(int target, int[][] matrix) {
-    if (matrix == null || matrix.length == 0 || matrix[0].length == 0)
-        return false;
-    int rows = matrix.length, cols = matrix[0].length;
-    int r = 0, c = cols - 1; // 从右上角开始
-    while (r <= rows - 1 && c >= 0) {
-        if (target == matrix[r][c])
-            return true;
-        else if (target > matrix[r][c])
-            r++;
-        else 
-            c--;
-    }
-    return false;
-}
+```python
+# -*- coding:utf-8 -*-
+class Solution:
+    # array 二维列表
+    def Find(self, target, array):
+        # write code here
+        if array is None or len(array) == 0 or len(array[0]) == 0:
+            return False
+        rows = len(array)
+        cols = len(array[0])
+        ci = rows - 1
+        cj = 0
+        while ci >= 0 and cj < cols:
+            cur = array[ci][cj]
+            if cur == target:
+                return True
+            elif cur > target:
+                ci -= 1
+            else:
+                cj += 1
+        return False
 ```
 
 # 5. 替换空格
@@ -198,26 +202,29 @@ public boolean Find(int target, int[][] matrix) {
 
 复杂度：O(N) + O(1)
 
-```java
-public String replaceSpace(StringBuffer str) {
-    int oldLen = str.length();
-    for (int i = 0; i < oldLen; i++)
-        if (str.charAt(i) == ' ')
-            str.append("  ");
-
-    int P1 = oldLen - 1, P2 = str.length() - 1;
-    while (P1 >= 0 && P2 > P1) {
-        char c = str.charAt(P1--);
-        if (c == ' ') {
-            str.setCharAt(P2--, '0');
-            str.setCharAt(P2--, '2');
-            str.setCharAt(P2--, '%');
-        } else {
-            str.setCharAt(P2--, c);
-        }
-    }
-    return str.toString();
-}
+```python
+# -*- coding:utf-8 -*-
+class Solution:
+    # s 源字符串
+    def replaceSpace(self, s):
+        # write code here
+        ls = list(s)
+        old_len = len(ls)
+        for i in range(old_len):
+            if ls[i] == ' ':
+                ls.extend([' ', ' '])
+                
+        i = old_len - 1
+        j = len(ls) - 1
+        while i >= 0:
+            if ls[i] == ' ':
+                ls[j - 2 : j + 1] = ['%', '2', '0']
+                j = j - 3
+            else:
+                ls[j] = ls[i]
+                j = j - 1
+            i = i - 1
+        return ''.join(ls)   
 ```
 
 # 6. 从尾到头打印链表
@@ -234,18 +241,22 @@ public String replaceSpace(StringBuffer str) {
 
 ### 使用栈
 
-```java
-public ArrayList<Integer> printListFromTailToHead(ListNode listNode) {
-    Stack<Integer> stack = new Stack<>();
-    while (listNode != null) {
-        stack.add(listNode.val);
-        listNode = listNode.next;
-    }
-    ArrayList<Integer> ret = new ArrayList<>();
-    while (!stack.isEmpty())
-        ret.add(stack.pop());
-    return ret;
-}
+```python
+# -*- coding:utf-8 -*-
+# class ListNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+
+class Solution:
+    # 返回从尾部到头部的列表值序列，例如[1,2,3]
+    def printListFromTailToHead(self, listNode):
+        # write code here
+        list = []
+        while listNode is not None:
+            list.insert(0, listNode.val)
+            listNode = listNode.next
+        return list
 ```
 
 ### 使用递归
@@ -281,25 +292,30 @@ public ArrayList<Integer> printListFromTailToHead(ListNode listNode) {
 
 头结点和第一个节点的区别：头结点是在头插法中使用的一个额外节点，这个节点不存储值；第一个节点就是链表的第一个真正存储值的节点。
 
-```java
-public ArrayList<Integer> printListFromTailToHead(ListNode listNode) {
-    // 头插法构建逆序链表
-    ListNode head = new ListNode(-1);
-    while (listNode != null) {
-        ListNode memo = listNode.next;
-        listNode.next = head.next;
-        head.next = listNode;
-        listNode = memo;
-    }
-    // 构建 ArrayList
-    ArrayList<Integer> ret = new ArrayList<>();
-    head = head.next;
-    while (head != null) {
-        ret.add(head.val);
-        head = head.next;
-    }
-    return ret;
-}
+```python
+# -*- coding:utf-8 -*-
+# class ListNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+
+class Solution:
+    # 返回从尾部到头部的列表值序列，例如[1,2,3]
+    def printListFromTailToHead(self, listNode):
+        # write code here
+        head = ListNode(-1)
+        while listNode is not None:
+            memo = listNode.next
+            listNode.next = head.next
+            head.next = listNode
+            listNode = memo
+        
+        head = head.next
+        arr = []
+        while head is not None:
+            arr.append(head.val)
+            head = head.next
+        return arr
 ```
 
 # 7. 重建二叉树
